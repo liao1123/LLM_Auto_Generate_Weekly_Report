@@ -81,4 +81,4 @@ python generate_weekly_report.py \
 本项目仅用于学习与效率提升。请遵守学校学术规范与导师要求，生成内容应基于真实进展进行核对与修改，使用者自行承担使用后果。
 
 ## 参考
-周记批量生成：https://github.com/canxin121/xdu_weekly_journal# LLM_Auto_Generate_Weekly_Report
+周记批量生成：https://github.com/canxin121/xdu_weekly_journal
