@@ -1,0 +1,171 @@
+% !TEX program = pdflatex
+\documentclass[12pt]{article}
+\usepackage{geometry}
+\usepackage{CJKutf8}
+\usepackage[normalem]{ulem}
+\usepackage{array}
+\usepackage{graphicx}
+\usepackage{pgfkeys}
+
+\geometry{
+  paper=a4paper,
+  top=2.54cm,
+  bottom=2.54cm,
+  left=3.18cm,
+  right=3.18cm
+}
+\setlength{\parindent}{2em}
+\setlength{\parskip}{0pt}
+\renewcommand{\normalsize}{\fontsize{12pt}{20pt}\selectfont}
+\normalsize
+
+% Table helpers
+\setlength{\tabcolsep}{1.9mm}
+\setlength{\arrayrulewidth}{0.5pt}
+\renewcommand{\arraystretch}{1.15}
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+\newcolumntype{M}[1]{>{\centering\arraybackslash}m{#1}} % center with vertical middle
+\newcolumntype{L}[1]{>{\arraybackslash}p{#1}}
+
+% Column widths scaled from the original DOCX (sum = 1.0)
+\newlength{\ContentWidth}
+\newlength{\ColA}
+\newlength{\ColB}
+\newlength{\ColC}
+\newlength{\ColD}
+\newlength{\ColE}
+\newlength{\ColF}
+\newlength{\ColDEF}
+\newlength{\ColTotal}
+% Use the full text width so网格线只画一次不留额外空白，避免边缘位置叠线变粗
+\setlength{\ContentWidth}{\dimexpr\textwidth-12\tabcolsep-7\arrayrulewidth\relax}
+\setlength{\ColA}{0.10\ContentWidth} % 标签1宽度
+\setlength{\ColB}{0.28\ContentWidth} % 值1宽度（与ColF对称）
+\setlength{\ColC}{0.05\ContentWidth} % 标签2宽度
+\setlength{\ColD}{0.19\ContentWidth} % 值2宽度
+\setlength{\ColE}{0.10\ContentWidth} % 标签3宽度（与ColA对称）
+\setlength{\ColF}{0.28\ContentWidth} % 值3宽度（与ColB对称）
+\setlength{\ColDEF}{\dimexpr\ColD+\ColE+\ColF\relax}
+\setlength{\ColTotal}{\ContentWidth}
+
+% Content placeholders managed via key-value interface
+\newcommand{\FieldCollege}{}
+\newcommand{\FieldWeekNumber}{}
+\newcommand{\FieldMajor}{}
+\newcommand{\FieldProjectTitle}{}
+\newcommand{\FieldStudentName}{}
+\newcommand{\FieldStudentID}{}
+\newcommand{\FieldAdvisor}{}
+\newcommand{\MainWorkContent}{}
+\newcommand{\IssueContent}{}
+\newcommand{\PlanContent}{}
+\newcommand{\AdvisorOpinion}{}
+
+\pgfkeys{
+  /weeklylog/.is family,
+  /weeklylog,
+  reset/.style={/weeklylog/.cd,
+    college = {},
+    week = {},
+    major = {},
+    title = {},
+    student = {},
+    id = {},
+    advisor = {},
+    work = {},
+    issue = {},
+    plan = {},
+    opinion = {}
+  },
+  college/.code={\renewcommand*{\FieldCollege}{#1}},
+  week/.code={\renewcommand*{\FieldWeekNumber}{#1}},
+  major/.code={\renewcommand*{\FieldMajor}{#1}},
+  title/.code={\renewcommand*{\FieldProjectTitle}{#1}},
+  student/.code={\renewcommand*{\FieldStudentName}{#1}},
+  id/.code={\renewcommand*{\FieldStudentID}{#1}},
+  advisor/.code={\renewcommand*{\FieldAdvisor}{#1}},
+  work/.code={\renewcommand*{\MainWorkContent}{#1}},
+  issue/.code={\renewcommand*{\IssueContent}{#1}},
+  plan/.code={\renewcommand*{\PlanContent}{#1}},
+  opinion/.code={\renewcommand*{\AdvisorOpinion}{#1}}
+}
+
+\newcommand{\WeeklyLogEntry}[1]{%
+  \pgfkeys{/weeklylog/reset}%
+  \pgfkeys{/weeklylog/.cd, #1}%
+}
+
+\newsavebox{\SectionBoxTmp}
+\newcommand{\SectionBox}[2]{% #1 min height; expands if content taller
+  \setbox\SectionBoxTmp=\vbox{\begin{minipage}[t]{\linewidth}#2\end{minipage}}%
+  \dimen0=\dimexpr\ht\SectionBoxTmp+\dp\SectionBoxTmp\relax
+  \ifdim\dimen0<#1
+    \vbox to #1{\unvbox\SectionBoxTmp\vfill}%
+  \else
+    \unvbox\SectionBoxTmp
+  \fi}
+
+% 简化全宽行的写法，保证每段只画一条横线避免线条叠加
+% \newcommand{\FullRowHeading}[1]{\multicolumn{6}{|L{\ColTotal}|}{\textbf{#1}}\\\hline}
+% \newcommand{\FullRowContent}[2]{\multicolumn{6}{|L{\ColTotal}|}{\SectionBox{#1}{#2}}\\\hline}
+\newcommand{\FullRowHeading}[1]{\multicolumn{6}{|L{\textwidth}|}{\textbf{#1}}\\\hline}
+\newcommand{\FullRowContent}[2]{\multicolumn{6}{|L{\textwidth}|}{\SectionBox{#1}{#2}}\\\hline}
+\newcommand{\FullRow}[3]{%
+  \FullRowHeading{#1}%
+  \FullRowContent{#2}{#3}%
+}
+
+% 这块导致学院名会超过空行
+% \newcommand{\CollegeSlot}{\uline{\makebox[4em][c]{\FieldCollege}}}
+\newcommand{\CollegeSlot}{\uline{\FieldCollege}}
+\newcommand{\WeekSlot}{\makebox[4em][c]{\FieldWeekNumber}}
+\newcommand{\TitleFont}{\fontsize{16pt}{24pt}\selectfont}
+\newcommand{\songti}{\CJKfamily{gbsn}}
+
+\WeeklyLogEntry{%
+college = 网络与信息安全学院,
+week = 3,
+major = 网络空间安全,
+title = {推箱子小程序设计},
+student = 你的名字,
+id = 你的学号,
+advisor = 你的指导老师,
+work = {1）设计整体方案架构已完成初稿，涵盖系统主要模块及功能分布，结构清晰合理。2）技术选型报告正在编写，已调研多种技术方案，初步确定核心技术栈。3）详细设计计划制定中，明确了设计阶段时间安排和关键节点，确保后续工作有序推进。},
+issue = {1）问题：设计方案存在部分模块功能重叠风险；思路：组织小组讨论，进行方案对比，优化模块职责划分。2）问题：技术选型难以兼顾性能与开发效率；思路：评估技术优缺点，结合项目需求优先考虑稳定成熟方案。},
+plan = {1）完成技术选型报告，细化技术选型理由及备选方案分析。2）根据本周设计方案，开始详细设计文档编写，明确模块功能和接口。3）制定模块划分图和开发计划，为后续编码阶段做好准备。},
+opinion = {同意\par\vspace{0.6cm}\makebox[\linewidth][r]{指导教师（签名）：\hspace{0.8em}\raisebox{-0.4cm}{\includegraphics[width=2.8cm]{sign.jpg}}}}
+}
+\begin{document}
+\begin{CJK*}{UTF8}{gbsn}
+\songti
+\normalsize
+\thispagestyle{empty}
+
+%\begin{center}
+%  {\bfseries\TitleFont\CollegeSlot\,毕业设计（论文）周记\quad 第\,\WeekSlot\,周}
+%\end{center}
+
+\noindent
+{\bfseries\TitleFont
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}} c r}
+\CollegeSlot\,毕业设计（论文）周记 & 第\kern-1.3em \WeekSlot\kern-1.3em 周
+\end{tabular*}}
+
+\vspace{0.3em}
+
+\begin{center}
+\begin{tabular}{|M{\ColA}|M{\ColB}|M{\ColC}|M{\ColD}|M{\ColE}|M{\ColF}|}
+\hline
+\textbf{专业} & \FieldMajor & \textbf{题目} & \multicolumn{3}{M{\ColDEF}|}{\FieldProjectTitle} \\
+\hline
+\textbf{学生姓名} & \FieldStudentName & \textbf{学号} & \FieldStudentID & \textbf{指导教师} & \FieldAdvisor \\
+\hline
+\FullRow{1. 主要工作内容和进展}{3.8cm}{\MainWorkContent}
+\FullRow{2. 存在的主要问题和解决办法与思路}{2cm}{\IssueContent}
+\FullRow{3. 下周工作计划}{2.4cm}{\PlanContent}
+\FullRow{4. 导师意见}{2.2cm}{\AdvisorOpinion}
+\end{tabular}
+\end{center}
+
+\end{CJK*}
+\end{document}

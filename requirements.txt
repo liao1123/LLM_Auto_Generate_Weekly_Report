@@ -1,0 +1,10 @@
+openai
+dotenv
+python-docx
+pypdf
+exceptions
+argparse
+shutil
+subprocess
+pypdf
+python-docx
